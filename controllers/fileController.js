@@ -36,6 +36,7 @@ const pdfAndAudioUpload = async (req, res) => {
         const firestore = admin.firestore();
         const folderName = req.body.name;
         const description = req.body.description;
+        const price = req.body.price;
         if (!folderName) {
             throw new Error('Folder name is required');
         }
@@ -47,7 +48,15 @@ const pdfAndAudioUpload = async (req, res) => {
         const tempDir = path.join(__dirname, '..', 'uploads', 'temp');
         const files = req.files || [];
         let pdfFileName = '';
+        let pdfFileSize = 0;
         const audioFileNames = [];
+        const audioFileSizes = [];
+        const audioFiles = [];
+        let totalAudioFileSizes = 0;
+
+        // Base URL for files
+        const baseUrl = `${req.protocol}://${req.get('host')}/${folderName}/`;
+
         for (const file of files) {
             const tempPath = path.join(tempDir, file.filename);
             const finalPath = path.join(finalDir, file.filename);
@@ -57,12 +66,20 @@ const pdfAndAudioUpload = async (req, res) => {
             file.path = finalPath;
 
             if (file.fieldname === 'pdf') {
-                pdfFileName = file.filename;  // Store only the filename
+                pdfFileName = file.filename;
+                pdfFileSize = file.size / 1024 / 1024;
             } else if (file.fieldname.startsWith('audio_')) {
-                audioFileNames.push(file.filename);  // Store only the filename
+                audioFileNames.push(file.filename);
+                let audioFileSize = file.size / 1024 / 1024;
+                audioFileSizes.push(audioFileSize);
+                totalAudioFileSizes += audioFileSize;
+                audioFiles.push({
+                    name: file.filename,
+                    size: parseFloat(audioFileSize.toFixed(2)),
+                    url: `${baseUrl}${file.filename}`
+                });
             }
         }
-
         const pdfFilePath = path.join('uploads', folderName, pdfFileName);
         const audioFilePaths = audioFileNames.map(audio => path.join('uploads', folderName, audio));
         const docData = {
@@ -70,22 +87,30 @@ const pdfAndAudioUpload = async (req, res) => {
             audios: audioFilePaths,
             uploadedAt: new Date()
         };
-        // await firestore.collection('uploads').doc(folderName).set(docData);
         const product = new Product({
             name: folderName,
             description: description,
-            pdfFileName: pdfFileName,
-            audioFileNames: audioFileNames
+            price: price,
+            pdfFile: {
+                name: pdfFileName,
+                size: parseFloat(pdfFileSize.toFixed(2)),
+                url: `${baseUrl}${pdfFileName}`
+            },
+            audioFiles: audioFiles,
+            publish: 'published',
+            shared: [],
+            type: 'folder',
+            size: parseFloat((pdfFileSize + totalAudioFileSizes).toFixed(2))
         });
-        
+
+        await product.save();
+
+        console.log(product)
+
         res.json({
             message: 'Files uploaded successfully!',
-            pdfFileName: pdfFileName,
-            audioFileNames: audioFileNames,
-            files: files
+            product: product
         });
-        
-        product.save();
     } catch (err) {
         console.log(err)
         // Clean up temp files if there's an error

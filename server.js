@@ -50,27 +50,6 @@ app.use('/api/product', productRouters);
 // app.use('/api/data', mobileRouter);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 app.get('/api/data', (req, res) => {
     res.json({
         succcess: true

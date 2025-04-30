@@ -8,20 +8,18 @@ const Product = require('../models/Product');
 
 
 
+
 const productList = async (req, res) => {
 
     try {
-        const product = await Product.find({});
-        console.log(product)
-
+        const products = await Product.find({});
+ 
         res.json({
-            products: product
+            products: products
         })
 
     } catch (err) {
-
         res.status(500).json({ message: err.message });
-
     }
 
 };
@@ -29,15 +27,17 @@ const productDetail = async (req, res) => {
     try {
         const productId = req.body.params.productId;
         const productDetail = await Product.findById(productId);
-        console.log(productDetail)
         if (productDetail != null) {
             res.json({
-                data: productDetail,
+                product: productDetail,
                 message: 'success'
             })
         }
+        else{
+            res.status(500).json({message:'no data'})
+        }
     } catch (error) {
-res.status(500).json({message:'error'})
+        res.status(500).json({ message: 'error' })
     }
 }
 

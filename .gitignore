@@ -5,6 +5,7 @@
 # dependencies
 
 /node_modules
+/uploads
 
 /.pnp
 
@@ -31,6 +32,7 @@
 /build
 /public
 /database
+/uploads
 
 # misc
 
