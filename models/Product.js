@@ -17,10 +17,9 @@ const productSchema = new mongoose.Schema({
         size: { type: Number, required: true },
         url: { type: String, required: true }
     },
-    published: { type: String, required: true },
+    publish: { type: String, required: true },
     shared: [],
     modifiedAt: { type: Date, default: Date.now() },
-    type: { type: String, required: true },
     size: { type: Number, required: true },
 
 });
@@ -28,7 +27,6 @@ const productSchema = new mongoose.Schema({
 // Pre-save middleware to set id to _id
 productSchema.pre('save', function (next) {
     if (!this.id) {
-        console.log(this._id)
         this.id = this._id.toString();
     }
     next();

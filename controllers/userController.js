@@ -1,14 +1,13 @@
 const Chat = require('../models/Chat');
 
 const User = require('../models/User');
-const Video = require('../models/Video');
-
-
 
 const getUsers = async (req, res) => {
 
     const { perPage, page, sort } = req.body;
+
     console.log(req.body, ' this is get users')
+
     const skip = (page - 1) * perPage;
 
     try {
@@ -18,7 +17,7 @@ const getUsers = async (req, res) => {
         totalPages = Math.ceil(await User.countDocuments() / perPage);
 
         res.json({ users: users, totalPages: totalPages });
-
+console.log(users)
 
     } catch (err) {
 

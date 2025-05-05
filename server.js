@@ -9,6 +9,8 @@ const connectDB = require('./config/db');
 // const authRoutes = require('./routes/authRoutes');
 
 // const userRoutes = require('./routes/userRoutes.js');
+const authRouters = require('./routes/authRoutes.js');
+const userRouters = require('./routes/userRoutes.js');
 const fileRouters = require('./routes/fileRouter.js');
 const mobileRouter = require('./routes/authRoutes.js');
 const productRouters = require ('./routes/productRoutes.js')
@@ -44,7 +46,9 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 app.get('/', (req, res) => {
     console.log(path.join(__dirname))
 })
-// app.use('/api/admin', adminRoutes);
+app.use('/initialize',  authRouters);
+app.use('/api/auth',  authRouters);
+app.use('/api/user',  userRouters);
 app.use('/api/file',  fileRouters);
 app.use('/api/product', productRouters);
 // app.use('/api/data', mobileRouter);

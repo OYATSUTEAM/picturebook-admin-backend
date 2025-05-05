@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const { pdfAndAudioUpload, pdfFileName } = require('../controllers/fileController')
+const { pdfAndAudioUpload, isExistPdfFileName, pdfAndAudioUpdate, deleteExisitingFolder } = require('../controllers/fileController')
 const router = express.Router();
 
 const storage = multer.diskStorage({
@@ -26,7 +26,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post('/upload', upload.any(), pdfAndAudioUpload);
-router.post('/filename', pdfFileName);
-
+router.post('/update', upload.any(), pdfAndAudioUpdate);
+router.post('/deleteExistingFile', deleteExisitingFolder);
+router.post('/filename', isExistPdfFileName);
 
 module.exports = router;

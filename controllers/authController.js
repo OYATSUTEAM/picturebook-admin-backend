@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 
@@ -8,56 +9,108 @@ const Chat = require('../models/Chat');
 const nodemailer = require('nodemailer');
 
 
-exports.register = async (req, res) => {
-  console.log('mobile request is here')
-  // const { name, email, password, confirmPassword } = req.body;
+require('dotenv').config();
 
-  // if (password !== confirmPassword) {
 
-  //   return res.status(400).json({ message: 'パスワードが一致しません。' });
 
-  // }
+exports.initialize = async (req, res) => {
+  console.log('initial request is here')
 
-  // const userExists = await User.findOne({ email });
+  const email = process.env.ADMINEMAIL
 
-  // if (userExists) {
+  const name = process.env.ADMINNAME
 
-  //   return res.status(400).json({ message: 'メールアドレスはすでに存在します。' });
+  const password = process.env.ADMINPASSWORD
 
-  // }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await User.findOneAndDelete({ email: email });
+  const user = new User({ name, email, password: hashedPassword, decryptedPassword: password, role: 'admin' });
 
-  // const hashedPassword = await bcrypt.hash(password, 10);
+  await user.save();
 
-  // const user = new User({ name, email, password: hashedPassword, decryptedPassword: password });
-
-  // await user.save();
-
-  // const token = generateToken(user._id);
+  const token = generateToken(user._id);
 
   res.status(201).json(
 
     {
 
-      //   message: '正常にサインアップしました。',
+      message: '正常にサインアップしました。',
 
-      //   user: {
-      //     userid: user._id,
+      user: {
+        userid: user._id,
 
-      //     token: token,
+        token: token,
 
-      //     name: name,
+        name: name,
 
-      //     email: email,
+        email: email,
 
-      //     avatar: user.avatar,
+        role: user.role,
 
-      //     role: user.role,
+        status: user.status,
 
-      //     status: user.status,
+      },
 
-      //   },
+      unread: 0,
 
-      //   unread: 0,
+    }
+
+  );
+}
+
+
+
+
+exports.register = async (req, res) => {
+
+  console.log('register request is here')
+
+  const { name, email, password, passwordConfirm } = req.body;
+
+  if (password !== passwordConfirm) {
+
+    return res.status(400).json({ message: 'パスワードが一致しません。' });
+
+  }
+
+  const userExists = await User.findOne({ email });
+
+  if (userExists) {
+
+    return res.status(400).json({ message: 'メールアドレスはすでに存在します。' });
+
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = new User({ name, email, password: hashedPassword, decryptedPassword: password });
+
+  await user.save();
+
+  const token = generateToken(user._id);
+
+  res.status(201).json(
+
+    {
+
+      message: '正常にサインアップしました。',
+
+      user: {
+        userid: user._id,
+
+        token: token,
+
+        name: name,
+
+        email: email,
+
+        role: user.role,
+
+        status: user.status,
+
+      },
+
+      unread: 0,
 
     }
 
@@ -68,6 +121,8 @@ exports.register = async (req, res) => {
 
 
 exports.login = async (req, res) => {
+
+  console.log(req.body, 'this is login request')
 
   const { email, password } = req.body;
 
@@ -93,16 +148,6 @@ exports.login = async (req, res) => {
 
 
 
-  const chat = await Chat.findOne({ userId: user._id });
-
-  if (chat) {
-
-    unread = chat?.new;
-
-  }
-
-
-
   const token = generateToken(user._id);
 
   res.status(200).json(
@@ -111,16 +156,15 @@ exports.login = async (req, res) => {
 
       message: 'サインインに成功しました。',
 
-      user: {
-        userid: user._id,
+      accessToken: token,
 
-        token: token,
+      user: {
+
+        userid: user._id,
 
         name: user.name,
 
         email: user.email,
-
-        avatar: user.avatar,
 
         role: user.role,
 
@@ -136,6 +180,45 @@ exports.login = async (req, res) => {
 
 };
 
+
+
+exports.isMe = async (req, res) => {
+  try {
+    // Get token from Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: '認証トークンが必要です。' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    
+    // Verify token and get user
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(401).json({ message: 'ユーザーが見つかりません。' });
+    }
+
+    let unread = false;
+
+    res.status(200).json({
+      message: '認証成功',
+      user: {
+        userid: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+      },
+      unread: unread
+    });
+
+  } catch (error) {
+    console.error('Token verification error:', error);
+    return res.status(401).json({ message: '無効なトークンです。' });
+  }
+};
 
 
 exports.forgotPassword = async (req, res) => {

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 
 const userSchema = new mongoose.Schema({
+  id: { type: String, },
 
   name: {
 
@@ -30,47 +31,28 @@ const userSchema = new mongoose.Schema({
 
   },
 
-  decryptedPassword :{
-    type:String, 
-    
-    // required :true
+  decryptedPassword: {
+
+    type: String,
+
+    required: true
   },
 
   role: {
 
     type: String,
 
-    default: '学生'
+    default: 'user'
 
   },
 
-  avatar: {
 
-    type: String
 
-  },
-
-  posterCounts: {
-
-    type: Number,
-
-    default: 0
-
-  },
-
-  viewCounts: {
-
-    type: Number,
-
-    default: 0
-
-  },
-
-  likes: [{
+  purchased: [{
 
     type: mongoose.Schema.Types.ObjectId,
 
-    ref: 'Video',
+    ref: 'Product',
 
     default: null
 
@@ -92,22 +74,21 @@ const userSchema = new mongoose.Schema({
 
   },
 
-  status :{
+  status: {
     type: String,
-    default:'permitted'
+    default: 'permitted'
   },
-  
-  uploads:{type:Number, default:0},
 
-  searchField:{
-
-    type:String
-
-  }
 
 }, { timestamps: true });
 
 
+userSchema.pre('save', function (next) {
+  if (!this.id) {
+    this.id = this._id.toString();
+  }
+  next();
+});
 
 userSchema.pre('save', function (next) {
 
@@ -118,13 +99,12 @@ userSchema.pre('save', function (next) {
 });
 
 
-
 // Add indexes to frequently queried fields
 
 userSchema.index({ searchField: 'text' });
 
 
 
-const User =  mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
 
 module.exports = User

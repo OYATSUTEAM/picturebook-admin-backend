@@ -1,7 +1,6 @@
 const Chat = require('../models/Chat');
 
 const User = require('../models/User');
-const Video = require('../models/Video');
 const Product = require('../models/Product');
 
 
