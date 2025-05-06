@@ -96,7 +96,7 @@ exports.register = async (req, res) => {
       message: '正常にサインアップしました。',
 
       user: {
-        userid: user._id,
+        id: user._id,
 
         token: token,
 
@@ -136,8 +136,6 @@ exports.login = async (req, res) => {
 
   }
 
-
-
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
@@ -145,8 +143,6 @@ exports.login = async (req, res) => {
     return res.status(400).json({ message: '無効な資格情報。' });
 
   }
-
-
 
   const token = generateToken(user._id);
 
@@ -160,7 +156,7 @@ exports.login = async (req, res) => {
 
       user: {
 
-        userid: user._id,
+        id: user._id,
 
         name: user.name,
 
@@ -185,6 +181,8 @@ exports.login = async (req, res) => {
 exports.isMe = async (req, res) => {
   try {
     // Get token from Authorization header
+
+    
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ message: '認証トークンが必要です。' });
@@ -194,7 +192,7 @@ exports.isMe = async (req, res) => {
     
     // Verify token and get user
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId);
+    const user = await User.findById(decoded.id);
 
     if (!user) {
       return res.status(401).json({ message: 'ユーザーが見つかりません。' });
@@ -205,11 +203,12 @@ exports.isMe = async (req, res) => {
     res.status(200).json({
       message: '認証成功',
       user: {
-        userid: user._id,
+        IdleDeadline: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
         status: user.status,
+        purchased: user.purchased,
       },
       unread: unread
     });

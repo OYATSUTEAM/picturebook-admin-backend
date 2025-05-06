@@ -14,9 +14,7 @@ const userRouters = require('./routes/userRoutes.js');
 const fileRouters = require('./routes/fileRouter.js');
 const mobileRouter = require('./routes/authRoutes.js');
 const productRouters = require ('./routes/productRoutes.js')
-// const adminRoutes = require('./routes/adminRoutes.js');
 
-// const paymentRroutes = require('./routes/paymentroutes.js');
 const path = require('path');
 const { pdfFilter } = require('./controllers/fileController.js');
 const app = express();
@@ -33,16 +31,6 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'uploads')));
 
-// Serve static files from 'public' directory
-
-// app.use('/thumbnails', express.static('public/thumbnails'));
-
-
-// Routes
-
-// app.use('/api/auth', authRoutes);
-
-// app.use('/api/users', userRoutes);
 app.get('/', (req, res) => {
     console.log(path.join(__dirname))
 })

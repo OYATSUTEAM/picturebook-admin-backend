@@ -17,7 +17,6 @@ const getUsers = async (req, res) => {
         totalPages = Math.ceil(await User.countDocuments() / perPage);
 
         res.json({ users: users, totalPages: totalPages });
-console.log(users)
 
     } catch (err) {
 
@@ -141,7 +140,7 @@ const getPermission = async (req, res) => {
 
     try {
 
-        const user = await User.findOne({ email: email});
+        const user = await User.findOne({ email: email });
 
         res.json({ permission: user.status });
 
