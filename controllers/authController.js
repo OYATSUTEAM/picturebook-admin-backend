@@ -12,7 +12,6 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 
-
 exports.initialize = async (req, res) => {
   console.log('initial request is here')
 
@@ -36,20 +35,20 @@ exports.initialize = async (req, res) => {
 
       message: '正常にサインアップしました。',
 
-      user: {
-        userid: user._id,
+      // user: {
+      //   userid: user._id,
 
-        token: token,
+      //   token: token,
 
-        name: name,
+      //   name: name,
 
-        email: email,
+      //   email: email,
 
-        role: user.role,
+      //   role: user.role,
 
-        status: user.status,
+      //   status: user.status,
 
-      },
+      // },
 
       unread: 0,
 
@@ -57,8 +56,6 @@ exports.initialize = async (req, res) => {
 
   );
 }
-
-
 
 
 exports.register = async (req, res) => {
@@ -182,14 +179,14 @@ exports.isMe = async (req, res) => {
   try {
     // Get token from Authorization header
 
-    
+
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ message: '認証トークンが必要です。' });
     }
 
     const token = authHeader.split(' ')[1];
-    
+
     // Verify token and get user
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
