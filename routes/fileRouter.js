@@ -16,10 +16,10 @@ const storage = multer.diskStorage({
     cb(null, tempDir);
   },
   filename: function (req, file, cb) {
-    // Properly handle Unicode filenames
-    const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
-    const safeName = decodeURIComponent(originalName);
-    cb(null, safeName);
+    // Generate a random filename with the original extension
+    const ext = path.extname(file.originalname);
+    const randomName = uuidv4() + ext;
+    cb(null, randomName);
   }
 });
 
