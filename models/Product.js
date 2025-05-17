@@ -24,7 +24,7 @@ const productSchema = new mongoose.Schema({
         url: { type: String, required: true }
     },
     publish: { type: String, required: true },
-    shared: [],
+    purchased: [],
     modifiedAt: { type: Date, default: Date.now() },
     size: { type: Number, required: true },
 

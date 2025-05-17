@@ -65,13 +65,11 @@ const pdfAndAudioUpload = async (req, res) => {
 
             file.path = finalPath;
             if (file.fieldname === 'animation') {
-                console.log(file)
-                pdfFileName = file.filename;
+                animationName = file.filename;
                 animationSize = file.size / 1024 / 1024;
             }
             else if (file.fieldname === 'pdf') {
-                console.log(file)
-                animationName = file.filename;
+                pdfFileName = file.filename;
                 pdfFileSize = file.size / 1024 / 1024;
             } else if (file.fieldname.startsWith('audio_')) {
                 let audioFileSize = file.size / 1024 / 1024;
@@ -88,7 +86,11 @@ const pdfAndAudioUpload = async (req, res) => {
             description: description,
             price: price,
             animationThumbUrl: 'price',
-            animationFile: pdf,
+            animationFile: {
+                name: animationName,
+                size: parseFloat(animationSize.toFixed(2)),
+                url: `${baseUrl}${animationName}`
+            },
             pdfFile: {
                 name: pdfFileName,
                 size: parseFloat(pdfFileSize.toFixed(2)),
@@ -96,7 +98,7 @@ const pdfAndAudioUpload = async (req, res) => {
             },
             audioFiles: audioFiles,
             publish: 'published',
-            shared: [],
+            purchased: [],
             size: parseFloat((pdfFileSize + totalAudioFileSizes).toFixed(2))
         });
 
@@ -193,7 +195,6 @@ const pdfAndAudioUpdate = async (req, res) => {
                 });
             }
         }
-        console.log(audioFiles);
 
         if (pdfFileName) {
             sData.pdfFile = {
@@ -209,7 +210,6 @@ const pdfAndAudioUpdate = async (req, res) => {
         if (pdfFileSize + totalAudioFileSizes) {
             sData.size = parseFloat((pdfFileSize + totalAudioFileSizes).toFixed(2));
         }
-
 
         const updateResult = await Product.findByIdAndUpdate(productId, sData, { new: true });
 
