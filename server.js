@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 app.get('/', (req, res) => {
     console.log(path.join(__dirname))
 })
-app.use('/initialize',  authRouters);
+app.use('/v1/initialize',  authRouters);
 app.use('/api/auth',  authRouters);
 app.use('/api/user',  userRouters);
 app.use('/api/file',  fileRouters);

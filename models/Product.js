@@ -12,6 +12,12 @@ const productSchema = new mongoose.Schema({
         size: { type: Number, required: true },
         url: { type: String, required: true }
     }],
+    animationFile: {
+        name: { type: String, required: true },
+        size: { type: Number, required: true },
+        url: { type: String, required: true }
+    },
+    animationThumbUrl: { type: String, required: true },
     pdfFile: {
         name: { type: String, required: true },
         size: { type: Number, required: true },

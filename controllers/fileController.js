@@ -49,8 +49,11 @@ const pdfAndAudioUpload = async (req, res) => {
         const files = req.files || [];
         const audioFiles = [];
         let totalAudioFileSizes = 0;
+        let animationName;
+        let animationSize;
         let pdfFileName;
         let pdfFileSize;
+
         // Base URL for files
         const baseUrl = `${req.protocol}://${req.get('host')}/${folderName}/`;
 
@@ -61,10 +64,14 @@ const pdfAndAudioUpload = async (req, res) => {
             fs.renameSync(tempPath, finalPath);
 
             file.path = finalPath;
-
-            if (file.fieldname === 'pdf') {
+            if (file.fieldname === 'animation') {
                 console.log(file)
                 pdfFileName = file.filename;
+                animationSize = file.size / 1024 / 1024;
+            }
+            else if (file.fieldname === 'pdf') {
+                console.log(file)
+                animationName = file.filename;
                 pdfFileSize = file.size / 1024 / 1024;
             } else if (file.fieldname.startsWith('audio_')) {
                 let audioFileSize = file.size / 1024 / 1024;
@@ -80,6 +87,8 @@ const pdfAndAudioUpload = async (req, res) => {
             name: folderName,
             description: description,
             price: price,
+            animationThumbUrl: 'price',
+            animationFile: pdf,
             pdfFile: {
                 name: pdfFileName,
                 size: parseFloat(pdfFileSize.toFixed(2)),
@@ -92,7 +101,6 @@ const pdfAndAudioUpload = async (req, res) => {
         });
 
         await product.save();
-
 
         res.json({
             message: 'Files uploaded successfully!',
