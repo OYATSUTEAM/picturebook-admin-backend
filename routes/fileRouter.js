@@ -16,10 +16,14 @@ const storage = multer.diskStorage({
     cb(null, tempDir);
   },
   filename: function (req, file, cb) {
-    // Generate a random filename with the original extension
+    // If the file is mp3, keep the original name; otherwise, generate a random filename
     const ext = path.extname(file.originalname);
-    const randomName = uuidv4() + ext;
-    cb(null, randomName);
+    if (ext.toLowerCase() === '.mp3') {
+      cb(null, file.originalname);
+    } else {
+      const randomName = uuidv4() + ext;
+      cb(null, randomName);
+    }
   }
 });
 
